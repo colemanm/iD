@@ -147,7 +147,7 @@ iD.svg.Vertices = function(projection, context) {
 
     function drawVertices(surface, graph, entities, filter, zoom) {
         var selected = siblingAndChildVertices(context.selection(), graph),
-            vertices = [];
+            vertices = d3.values(selected);
 
         for (var i = 0; i < entities.length; i++) {
             var entity = entities[i];
@@ -155,20 +155,26 @@ iD.svg.Vertices = function(projection, context) {
             if (entity.geometry(graph) !== 'vertex')
                 continue;
 
-            if (entity.id in selected ||
-                entity.hasInterestingTags() ||
+            if (entity.hasInterestingTags() ||
                 isIntersection(entity, graph)) {
-                vertices.push(entity)
+                vertices.push(entity);
             }
         }
 
         surface.select('.layer-hit').selectAll('g.vertex.vertex-persistent')
-            .filter(filter)
+            .filter(vertexFilter)
             .data(vertices, iD.Entity.key)
             .call(draw, graph, zoom)
-            .classed('vertex-persistent', true);
+            .classed('vertex-persistent', true)
+            .classed('vertex-selected', function(d) {
+                return !d.hasInterestingTags() && !isIntersection(d, graph);
+            });
 
         drawHover(surface, graph, zoom);
+
+        function vertexFilter(d) {
+            return filter(d) || d3.select(this).classed('vertex-selected');
+        }
     }
 
     function drawHover(surface, graph, zoom) {

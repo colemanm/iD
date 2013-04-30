@@ -30,8 +30,12 @@ iD.Map = function(context) {
         context.history()
             .on('change.map', redraw);
 
-        context.on('select.map', function() {
-            redraw();
+        context.on('select.map', function(selected) {
+            var complete = {};
+            for (var i = 0; i < selected.length; i++) {
+                complete[selected[i]] = context.entity(selected[i]);
+            }
+            redraw({ complete: function() { return complete; } });
         });
 
         selection.call(zoom);

@@ -17,8 +17,7 @@ iD.svg.Midpoints = function(projection, context) {
                     b = nodes[j + 1],
                     id = [a.id, b.id].sort().join('-');
 
-                // If neither of the nodes changed, no need to redraw midpoint
-                if (!midpoints[id] && (filter(a) || filter(b))) {
+                if (!midpoints[id]) {
                     var loc = iD.geo.interp(a.loc, b.loc, 0.5);
                     if (extent.intersects(loc) && iD.geo.dist(projection(a.loc), projection(b.loc)) > 40) {
                         midpoints[id] = {
@@ -33,7 +32,6 @@ iD.svg.Midpoints = function(projection, context) {
         }
 
         var groups = surface.select('.layer-hit').selectAll('g.midpoint')
-            .filter(filter)
             .data(_.values(midpoints), function(d) { return d.id; });
 
         var group = groups.enter()
