@@ -7,37 +7,37 @@
    Only one of these elements can have the :hover pseudo-class, but all of them will
    have the .hover class.
  */
-iD.behavior.Hover = function() {
-    var selection,
-        altDisables;
+iD.behavior.Hover = function(context) {
+    var altDisables,
+        target;
 
-    function keydown() {
-        if (altDisables && d3.event.keyCode === d3.keybinding.modifierCodes.alt) {
-            selection.classed('behavior-hover', false);
+    var hover = function(selection) {
+        function keydown() {
+            if (altDisables && d3.event.keyCode === d3.keybinding.modifierCodes.alt) {
+                context.hover(null);
+                selection.classed('behavior-hover', false);
+            }
         }
-    }
 
-    function keyup() {
-        if (altDisables && d3.event.keyCode === d3.keybinding.modifierCodes.alt) {
-            selection.classed('behavior-hover', true);
+        function keyup() {
+            if (altDisables && d3.event.keyCode === d3.keybinding.modifierCodes.alt) {
+                context.hover(target);
+                selection.classed('behavior-hover', true);
+            }
         }
-    }
-
-    var hover = function(__) {
-        selection = __;
 
         if (!altDisables || !d3.event || !d3.event.altKey) {
             selection.classed('behavior-hover', true);
         }
 
         function mouseover() {
-            var datum = d3.event.target.__data__;
+            target = d3.event.target.__data__;
 
-            if (datum) {
-                var hovered = [datum.id];
+            if (target) {
+                var hovered = [target.id];
 
-                if (datum.type === 'relation') {
-                    hovered = hovered.concat(_.pluck(datum.members, 'id'));
+                if (target.type === 'relation') {
+                    hovered = hovered.concat(_.pluck(target.members, 'id'));
                 }
 
                 hovered = d3.set(hovered);
@@ -45,12 +45,17 @@ iD.behavior.Hover = function() {
                 selection.selectAll('*')
                     .filter(function(d) { return d && hovered.has(d.id); })
                     .classed('hover', true);
+
+                context.hover(target);
             }
         }
 
         selection.on('mouseover.hover', mouseover);
 
         selection.on('mouseout.hover', function() {
+            context.hover(null);
+            target = null;
+
             selection.selectAll('.hover')
                 .classed('hover', false);
         });
