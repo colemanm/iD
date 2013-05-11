@@ -12,7 +12,7 @@ iD.ui.Hover = function(context) {
                     .html('')
                     .call(iD.ui.PresetIcon(context.geometry(entity.id)));
 
-                name.text(entity.tags.name);
+                name.text(iD.util.localeName(entity));
                 type.text(preset.name());
             } else {
                 icon.html('');

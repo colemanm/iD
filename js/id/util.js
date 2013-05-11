@@ -6,6 +6,11 @@ iD.util.tagText = function(entity) {
     }).join(', ');
 };
 
+iD.util.localeName = function(entity) {
+    var localeName = 'name:' + iD.detect().locale.toLowerCase().split('-')[0];
+    return entity.tags[localeName] || entity.tags.name;
+};
+
 iD.util.stringQs = function(str) {
     return str.split('&').reduce(function(obj, pair){
         var parts = pair.split('=');
